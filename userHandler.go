@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Set-Kaung/rssagg/internal/auth"
 	"github.com/Set-Kaung/rssagg/internal/database"
 	"github.com/google/uuid"
 )
@@ -33,9 +34,20 @@ func (ap *apiConfig) CreateUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, 500, "couldn't create user")
 		return
 	}
-	respondWithJSON(w, 200, dbUsertoUser(user))
+	respondWithJSON(w, 201, dbUsertoUser(user))
 }
 
 func (ap *apiConfig) GetUser(w http.ResponseWriter, r *http.Request) {
-
+	apikey, err := auth.GetAPIKey(r.Header)
+	if err != nil {
+		respondWithError(w, 403, "auth error "+err.Error())
+		return
+	}
+	user, err := ap.DB.GetUserByAPIKey(r.Context(), apikey)
+	if err != nil {
+		log.Println(err)
+		respondWithError(w, 500, "couldn't get user")
+		return
+	}
+	respondWithJSON(w, 200, dbUsertoUser(user))
 }
