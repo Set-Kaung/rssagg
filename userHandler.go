@@ -33,5 +33,9 @@ func (ap *apiConfig) CreateUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, 500, "couldn't create user")
 		return
 	}
-	respondWithJSON(w, 200, user)
+	respondWithJSON(w, 200, dbUsertoUser(user))
+}
+
+func (ap *apiConfig) GetUser(w http.ResponseWriter, r *http.Request) {
+
 }
